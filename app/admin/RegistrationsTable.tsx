@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-import { Loader2, Mail, Phone, Search, Trash2 } from "lucide-react";
+import { Inbox, Loader2, Mail, Phone, Search, Trash2 } from "lucide-react";
 import type { Registration } from "@/lib/db";
 import { cn } from "@/lib/utils";
 import { removeRegistration, saveRegistration } from "./actions";
@@ -15,6 +15,16 @@ const STATUS_STYLES: Record<string, string> = {
   cancelled: "bg-slate-100 text-slate-500 ring-slate-400/20",
 };
 const STATUSES = Object.keys(STATUS_STYLES);
+
+// Same palette as the student avatars in the homepage hero.
+const AVATAR_COLORS = ["#0056B3", "#3381D6", "#C1121F", "#13314F"];
+const initials = (name: string) =>
+  name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() ?? "")
+    .join("");
 
 const fmtDate = (d: string) =>
   new Date(d).toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
@@ -52,8 +62,17 @@ export function RegistrationsTable({
   }, [registrations, q, program, center, status]);
 
   return (
-    <section className="mt-6 rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
-      <div className="grid gap-3 border-b border-slate-200 p-4 sm:grid-cols-2 lg:grid-cols-4">
+    <section className="mt-6 overflow-hidden rounded-3xl bg-white shadow-[0_20px_40px_-24px_rgba(10,28,46,0.25)] ring-1 ring-slate-200">
+      <div className="flex flex-wrap items-end justify-between gap-2 px-5 pt-5">
+        <div>
+          <span className="eyebrow">Students</span>
+          <h2 className="mt-2 text-xl font-extrabold text-navy">All registrations</h2>
+        </div>
+        <p className="text-xs text-slate-500">
+          Showing <span className="font-bold text-navy">{filtered.length}</span> of {registrations.length}
+        </p>
+      </div>
+      <div className="grid gap-3 border-b border-slate-100 p-5 sm:grid-cols-2 lg:grid-cols-4">
         <div className="relative">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
@@ -73,14 +92,20 @@ export function RegistrationsTable({
         />
       </div>
 
-      <p className="px-4 pt-3 text-xs text-slate-500">
-        Showing {filtered.length} of {registrations.length}
-      </p>
-
       {filtered.length === 0 ? (
-        <p className="p-10 text-center text-sm text-slate-500">
-          {registrations.length === 0 ? "No pre-registrations yet." : "No registrations match these filters."}
-        </p>
+        <div className="flex flex-col items-center px-6 py-14 text-center">
+          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-50 text-brand">
+            <Inbox className="h-7 w-7" />
+          </span>
+          <p className="mt-4 font-bold text-navy">
+            {registrations.length === 0 ? "No pre-registrations yet" : "No matches"}
+          </p>
+          <p className="mt-1 max-w-xs text-sm text-slate-500">
+            {registrations.length === 0
+              ? "When a student submits the form on the website, they'll appear here and you'll get an email."
+              : "Try a different search or clear the filters."}
+          </p>
+        </div>
       ) : (
         <ul className="divide-y divide-slate-100">
           {filtered.map((r) => (
@@ -149,8 +174,15 @@ function Row({ r, programTitle, centerTitle }: { r: Registration; programTitle: 
   };
 
   return (
-    <li className={cn("p-4 transition", pending && "opacity-60")}>
+    <li className={cn("px-5 py-4 transition hover:bg-brand-50/40", pending && "opacity-60")}>
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+        <span
+          className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white sm:flex"
+          style={{ background: AVATAR_COLORS[r.id % AVATAR_COLORS.length] }}
+          aria-hidden="true"
+        >
+          {initials(r.name)}
+        </span>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <p className="font-semibold text-navy">{r.name}</p>

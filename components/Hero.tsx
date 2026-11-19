@@ -159,7 +159,8 @@ export function Hero() {
   );
 }
 
-function RoadMapBackground() {
+/** Shared with the admin login page (app/admin/login). */
+export function RoadMapBackground() {
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
       {/* Base gradient: brand blue → deep navy (same as the old panel) */}
@@ -289,7 +290,8 @@ const CARDS = [
   },
 ];
 
-function FloatingCards() {
+/** Shared with the admin login page (app/admin/login). */
+export function FloatingCards() {
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 hidden xl:block">
       {CARDS.map((c) => (
